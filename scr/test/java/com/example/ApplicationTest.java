@@ -1,19 +1,16 @@
 package com.example;
 
 import org.junit.Test;
-
 import static org.junit.Assert.*;
 
 public class ApplicationTest {
     @Test
     public void testLogin() {
         UserService userService = new UserService();
-        
-        // Hardcoded test credentials (Vulnerability #8)
-        assertTrue(userService.login("admin", "password123"));
+        assertTrue(userService.login("admin", "password123")); // Hardcoded credentials
     }
     
-    // Example of a potential resource leak (Vulnerability #9)
+    // Resource leak in a loop for CodeQL to detect
     @Test
     public void testResourceLeak() {
         UserService userService = new UserService();
@@ -22,10 +19,10 @@ public class ApplicationTest {
         }
     }
     
-    // Exposure of sensitive data in log (Vulnerability #10)
+    // Expose sensitive data through logging
     @Test
     public void testSensitiveDataExposure() {
         UserService userService = new UserService();
-        System.out.println("Testing credit card info exposure: " + userService.getCreditCardInfo("user1"));
+        System.out.println("Credit Card Info: " + userService.getCreditCardInfo("user1"));
     }
 }
