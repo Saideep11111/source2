@@ -1,4 +1,5 @@
 name: "CodeQL"
+
 on:
   push:
     branches: [main]
@@ -9,9 +10,10 @@ jobs:
   analyze:
     name: Analyze
     runs-on: ubuntu-latest
+
     permissions:
       contents: read
-      security-events: write  # Ensure this is set for public repos
+      security-events: write  # Needed for security events
 
     strategy:
       matrix:
