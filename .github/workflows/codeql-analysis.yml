@@ -5,7 +5,7 @@ on:
   pull_request:
     branches: [main]
   schedule:
-    - cron: '0 0 * * 1'  # Optional: runs weekly on Mondays
+    - cron: '0 0 * * 1'
 
 jobs:
   analyze:
@@ -30,9 +30,14 @@ jobs:
       with:
         languages: ${{ matrix.language }}
 
-    - name: Build using Maven
-      run: mvn clean compile # For Maven projects
-      # Alternatively, use `./gradlew build` for Gradle projects
+    # Explicitly build the project based on the build system
+    - name: Build with Maven
+      if: exists('pom.xml')
+      run: mvn clean compile -Dmaven.test.skip=true
+
+    - name: Build with Gradle
+      if: exists('build.gradle')
+      run: ./gradlew build -x test
 
     - name: Perform CodeQL Analysis
       uses: github/codeql-action/analyze@v2
