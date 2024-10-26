@@ -1,46 +1,47 @@
 package com.example;
 
-import java.sql.Connection; // Add this import
-import java.sql.DriverManager; // Add this import
-import java.sql.SQLException; // Add this import
-import java.sql.Statement; // Add this import
-import java.sql.ResultSet; // Add this import
-import java.util.ArrayList; // If you're using this
-import java.util.List; // If you're using this
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.*;
 
+import java.sql.*;
+
+@RestController
+@RequestMapping("/users")
 public class UserController {
 
-    public void createUser(String username, String password) {
-        String url = "jdbc:mysql://localhost:3306/mydb"; // Example DB URL
-        String user = "root"; // Example user
-        String pass = "password"; // Example password
+    @Autowired
+    private Database database;
 
-        try (Connection connection = DriverManager.getConnection(url, user, pass);
-             Statement stmt = connection.createStatement()) {
-
-            String sql = "INSERT INTO users (username, password) VALUES ('" + username + "', '" + password + "')";
-            stmt.executeUpdate(sql);
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-    }
-
-    public List<String> getUsers() {
-        List<String> users = new ArrayList<>();
-        String url = "jdbc:mysql://localhost:3306/mydb"; // Example DB URL
-        String user = "root"; // Example user
-        String pass = "password"; // Example password
-
-        try (Connection connection = DriverManager.getConnection(url, user, pass);
-             Statement stmt = connection.createStatement();
-             ResultSet rs = stmt.executeQuery("SELECT username FROM users")) {
-
-            while (rs.next()) {
-                users.add(rs.getString("username"));
+    // Vulnerable to SQL Injection
+    @GetMapping("/login")
+    public String login(@RequestParam String username, @RequestParam String password) {
+        String query = "SELECT * FROM users WHERE username = '" + username + "' AND password = '" + password + "'"; // SQL Injection
+        try (Connection conn = database.getConnection();
+             Statement stmt = conn.createStatement();
+             ResultSet rs = stmt.executeQuery(query)) {
+            if (rs.next()) {
+                return "Login successful";
+            } else {
+                return "Login failed";
             }
         } catch (SQLException e) {
             e.printStackTrace();
+            return "Error";
         }
-        return users;
+    }
+
+    // Hard-coded password vulnerability
+    @PutMapping("/update-password")
+    public String updatePassword(@RequestParam String username, @RequestParam String newPassword) {
+        String hardCodedPassword = "admin123"; // Hardcoded sensitive data
+        String query = "UPDATE users SET password = '" + newPassword + "' WHERE username = '" + username + "' AND password = '" + hardCodedPassword + "'";
+        try (Connection conn = database.getConnection();
+             Statement stmt = conn.createStatement()) {
+            int rowsAffected = stmt.executeUpdate(query);
+            return rowsAffected > 0 ? "Password updated" : "Update failed";
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return "Error";
+        }
     }
 }
