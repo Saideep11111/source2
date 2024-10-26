@@ -1,11 +1,14 @@
 package com.example;
 
-import org.springframework.boot.SpringApplication;
-import org.springframework.boot.autoconfigure.SpringBootApplication;
-
-@SpringBootApplication
 public class VulnerableApp {
+
     public static void main(String[] args) {
-        SpringApplication.run(VulnerableApp.class, args);
+        UserController userController = new UserController();
+        userController.createUser("admin", "password123");
+        
+        System.out.println("Users:");
+        for (String user : userController.getUsers()) {
+            System.out.println(user);
+        }
     }
 }
