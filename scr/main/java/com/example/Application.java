@@ -1,26 +1,29 @@
 package com.example;
 
 import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.SQLException;
+import java.util.Scanner;
 
 public class Application {
     public static void main(String[] args) {
         UserService userService = new UserService();
+
+        // Simulate user input to increase detection probability
+        Scanner scanner = new Scanner(System.in);
+        System.out.print("Enter username: ");
+        String username = scanner.nextLine();
+        System.out.print("Enter password: ");
+        String password = scanner.nextLine();
         
-        // Hardcoded credentials (Vulnerability #1)
-        String username = "admin";
-        String password = "password123";
         userService.login(username, password);
-        
-        // Unsafe deserialization (Vulnerability #2)
+
+        // Unsafe deserialization to simulate security alert
         UnsafeSerialization unsafeSerialization = new UnsafeSerialization();
         try {
             unsafeSerialization.deserializeObject("serialized-object.bin");
         } catch (IOException | ClassNotFoundException e) {
             e.printStackTrace();
         }
+        
+        scanner.close();
     }
 }
