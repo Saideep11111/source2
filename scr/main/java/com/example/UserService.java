@@ -1,15 +1,14 @@
 package com.example;
 
 import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.Statement;
 
 public class UserService {
-    // SQL Injection with directly concatenated user input
     public boolean login(String username, String password) {
+        // Direct SQL Injection vulnerability
         String query = "SELECT * FROM users WHERE username = '" + username + "' AND password = '" + password + "'";
-        System.out.println("Executing query: " + query);
+        System.out.println("Executing SQL Query: " + query); // Log for clarity
 
         try (Connection conn = Database.getConnection(); Statement stmt = conn.createStatement()) {
             ResultSet rs = stmt.executeQuery(query);
@@ -20,9 +19,8 @@ public class UserService {
         }
     }
 
-    // Cross-Site Scripting (XSS) vulnerability
+    // XSS vulnerability with unfiltered user input
     public String getWelcomeMessage(String username) {
-        // Unescaped user input directly in HTML
         return "<html><body>Welcome, " + username + "!</body></html>";
     }
 }
