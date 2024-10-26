@@ -29,10 +29,21 @@ jobs:
         with:
           languages: ${{ matrix.language }}
 
-      # Explicit build step - replace with appropriate build commands
       - name: Build with Maven
-        if: exists('pom.xml')
-        run: mvn clean compile -Dmaven.test.skip=true
+        run: |
+          if [ -f "pom.xml" ]; then
+            mvn clean compile -Dmaven.test.skip=true
+          else
+            echo "pom.xml not found, skipping Maven build."
+          fi
+
+      - name: Build with Gradle
+        run: |
+          if [ -f "build.gradle" ]; then
+            ./gradlew build -x test
+          else
+            echo "build.gradle not found, skipping Gradle build."
+          fi
 
       - name: Perform CodeQL Analysis
         uses: github/codeql-action/analyze@v2
