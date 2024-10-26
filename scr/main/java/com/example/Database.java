@@ -5,7 +5,7 @@ import java.sql.DriverManager;
 import java.sql.SQLException;
 
 public class Database {
-    // Hardcoded sensitive information (Vulnerability #6)
+    // Hardcoded database credentials
     private static final String DB_URL = "jdbc:mysql://localhost:3306/vulnerable_db";
     private static final String USER = "root";
     private static final String PASS = "rootpassword";
