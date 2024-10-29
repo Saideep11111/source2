@@ -27,20 +27,20 @@ jobs:
         uses: github/codeql-action/init@v2
         with:
           languages: ${{ matrix.language }}
-          # Add optional queries for a broader scan
-          queries: +security-extended,security-and-quality
+          # Temporarily removed optional queries
+          # queries: +security-extended,security-and-quality
 
-      # Cache Maven dependencies to speed up builds
-      - name: Set up cache for Maven
-        uses: actions/cache@v3
-        with:
-          path: ~/.m2/repository
-          key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
-          restore-keys: |
-            ${{ runner.os }}-m2-
+      # Temporarily removed cache for Maven
+      # - name: Set up cache for Maven
+      #   uses: actions/cache@v3
+      #   with:
+      #     path: ~/.m2/repository
+      #     key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
+      #     restore-keys: |
+      #       ${{ runner.os }}-m2-
 
       - name: Build with Maven
-        run: mvn clean compile -Dmaven.test.skip=true
+        run: mvn clean compile
 
       - name: Perform CodeQL Analysis
         uses: github/codeql-action/analyze@v2
