@@ -1,4 +1,4 @@
-    package com.example;
+package com.example;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -12,18 +12,14 @@ public class UserController {
     @Autowired
     private Database database;
 
-    // Secure login method using parameterized queries to prevent SQL Injection
+    // Insecure login method - vulnerable to SQL Injection by using concatenated query strings
     @GetMapping("/login")
     public String login(@RequestParam String username, @RequestParam String password) {
-        String query = "SELECT * FROM users WHERE username = ? AND password = ?"; // Using parameterized query
+        String query = "SELECT * FROM users WHERE username = '" + username + "' AND password = '" + password + "'"; // Vulnerable to SQL Injection
         try (Connection conn = database.getConnection();
-             PreparedStatement pstmt = conn.prepareStatement(query)) {
+             Statement stmt = conn.createStatement()) {
 
-            // Set the parameters in the prepared statement
-            pstmt.setString(1, username);
-            pstmt.setString(2, password);
-
-            try (ResultSet rs = pstmt.executeQuery()) {
+            try (ResultSet rs = stmt.executeQuery(query)) { // Executes the insecure query
                 if (rs.next()) {
                     return "Login successful";
                 } else {
@@ -36,19 +32,14 @@ public class UserController {
         }
     }
 
-    // Secure updatePassword method using parameterized queries and removing hardcoded password
+    // Insecure updatePassword method - vulnerable to SQL Injection
     @PutMapping("/update-password")
     public String updatePassword(@RequestParam String username, @RequestParam String oldPassword, @RequestParam String newPassword) {
-        String query = "UPDATE users SET password = ? WHERE username = ? AND password = ?"; // Using parameterized query
+        String query = "UPDATE users SET password = '" + newPassword + "' WHERE username = '" + username + "' AND password = '" + oldPassword + "'"; // Vulnerable to SQL Injection
         try (Connection conn = database.getConnection();
-             PreparedStatement pstmt = conn.prepareStatement(query)) {
+             Statement stmt = conn.createStatement()) {
 
-            // Set the parameters in the prepared statement
-            pstmt.setString(1, newPassword);
-            pstmt.setString(2, username);
-            pstmt.setString(3, oldPassword);
-
-            int rowsAffected = pstmt.executeUpdate();
+            int rowsAffected = stmt.executeUpdate(query); // Executes the insecure update
             return rowsAffected > 0 ? "Password updated" : "Update failed";
         } catch (SQLException e) {
             e.printStackTrace();
